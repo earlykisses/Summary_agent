@@ -20,8 +20,8 @@ Installation
 
 Clone the repository:
 
-git clone https://github.com/yourusername/ai-study-agent.git
-cd ai-study-agent
+git clone https://github.com/earklykisses/Summary_agent.git
+cd Summary_agent
 
 
 Create a virtual environment (optional but recommended):
