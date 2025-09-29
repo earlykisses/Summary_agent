@@ -4,10 +4,8 @@ from PyPDF2 import PdfReader
 from PIL import Image
 import pytesseract
 
-# Configure API
 genai.configure(api_key="AIzaSyAQwCIHD62GwMdh9BfA1S5PZPTBJ_ptA4I") 
 
-# Functions to read different file types
 def read_txt(file):
     return file.read().decode("utf-8")
 
@@ -24,7 +22,6 @@ def read_image(file):
     text = pytesseract.image_to_string(img)
     return text
 
-# Function to call AI
 def summarize_and_quiz_gemini(text):
     prompt = f"""
     I have the following study notes:
@@ -42,7 +39,6 @@ def summarize_and_quiz_gemini(text):
     response = model.generate_content(prompt)
     return response.text
 
-# Streamlit app
 def main():
     st.title("📚 AI Study Agent")
     st.write("Upload your notes (TXT, PDF, or Image) and get a summary + quiz!")
@@ -53,23 +49,25 @@ def main():
         accept_multiple_files=True
     )
 
-    if uploaded_files:  
-        all_text = ""
-        for uploaded_file in uploaded_files:  
+    if uploaded_files:
+        for uploaded_file in uploaded_files:
             if uploaded_file.name.endswith(".txt"):
-                all_text += read_txt(uploaded_file) + "\n"
+                note_text = read_txt(uploaded_file)
             elif uploaded_file.name.endswith(".pdf"):
-                all_text += read_pdf(uploaded_file) + "\n"
+                note_text = read_pdf(uploaded_file)
             elif uploaded_file.name.lower().endswith((".jpg","jpeg","png")):
-                all_text += read_image(uploaded_file) + "\n"
+                note_text = read_image(uploaded_file)
             else:
                 st.warning(f"Unsupported file type: {uploaded_file.name}")
+                continue
 
-        with st.spinner("Generating summary and quiz..."):
-            result = summarize_and_quiz_gemini(all_text)
+            st.subheader(f"📄 {uploaded_file.name}")
 
-        st.subheader("📄 Summary + Quiz")
-        st.markdown(result)
+            with st.spinner(f"Generating summary and quiz for {uploaded_file.name}..."):
+                result = summarize_and_quiz_gemini(note_text)
+
+            st.markdown(result)
+
 
 if __name__ == "__main__":
     main()
